@@ -1,0 +1,8 @@
+{
+  "name": "aws-lambda-top-stories",
+  "version": "0.0.1",
+  "description": "Have top stories from Reddit.com sent to your email.",
+  "dependencies": {
+    "aws-sdk": "^2.181.0"
+  }
+}

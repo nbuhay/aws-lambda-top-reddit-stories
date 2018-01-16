@@ -1,0 +1,9 @@
+### SublimeText3 ###
+*.sublime-project
+*.sublime-workspace
+
+### Vagrant ###
+**/.vagrant
+
+### Node.js ###
+**/*node_modules/*
