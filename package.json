@@ -4,5 +4,10 @@
   "description": "Have top stories from Reddit.com sent to your email.",
   "dependencies": {
     "aws-sdk": "^2.181.0"
+  },
+  "devDependencies": {
+    "gulp": "^3.9.1",
+    "gulp-filter": "^5.1.0",
+    "gulp-zip": "^4.1.0"
   }
 }

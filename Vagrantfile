@@ -17,7 +17,9 @@ Vagrant.configure("2") do |config|
       ./bu-toolbox/linux/ubuntu/install/nodejs.sh
       chmod u+x ./bu-toolbox/linux/ubuntu/install/awscli.sh      
       ./bu-toolbox/linux/ubuntu/install/awscli.sh
-      echo 'Configure awscli for usage: https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html#cli-quick-configuration'
+      
+      # install global gulp.js
+      npm install --global gulp
     SHELL
   config.vm.network "private_network", type: "dhcp"
   config.vm.network "forwarded_port", guest: 3001, host: 3001, host_ip: "127.0.0.1"

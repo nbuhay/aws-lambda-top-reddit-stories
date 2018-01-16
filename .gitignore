@@ -7,3 +7,6 @@
 
 ### Node.js ###
 **/*node_modules/*
+
+### aws-lambda-top-stories ###
+deploy/
