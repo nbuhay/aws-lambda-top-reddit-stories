@@ -20,12 +20,12 @@ Resources:
   SNSTopic:
     Type: AWS::SNS::Topic
     Properties: 
-      DisplayName: aws-lambda-top-stories
+      DisplayName: aws-lambda-top-stories-topic
       Subscription:
         - Endpoint:
             Ref: UserEmail
           Protocol: email
-      TopicName: aws-lambda-top-stories
+      TopicName: aws-lambda-top-stories-topic
 Outputs:
   S3Bucket:
     Description: >
@@ -33,11 +33,21 @@ Outputs:
     Value:
       Ref: S3Bucket
     Export:
-      Name: aws-lambda-top-stories:S3-BUCKET
+      Name: 
+        !Join
+          - ':'
+          - - !Ref AWS::Region
+            - aws-lambda-top-stories
+            - S3-BUCKET
   SNSTopic:
     Description: >
       SNS topic for emailing results of aws-lambda-top-stories lambda function executions.
     Value:
       Ref: SNSTopic
     Export:
-      Name: aws-lambda-top-stories:SNS-TOPIC
+      Name:
+        !Join
+          - ':'
+          - - !Ref AWS::Region
+            - aws-lambda-top-stories
+            - SNS-TOPIC
