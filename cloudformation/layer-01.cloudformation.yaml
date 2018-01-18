@@ -1,0 +1,78 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: >
+  Layer 1.
+  IAM role for lambda function.
+  Limited access to S3 and SNS actions and resources.
+Resources:
+  LambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      # Caution!  Reused names may cause unrecoverable error
+      # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html#cfn-iam-role-policies
+      RoleName:
+        !Join
+          - '.'
+          - - !Ref AWS::Region
+            - aws-lambda-top-stories-role
+      AssumeRolePolicyDocument: 
+        Version: 2012-10-17
+        Statement: 
+          - 
+            Effect: Allow
+            Principal: 
+              Service: 
+                - lambda.amazonaws.com
+            Action: 
+              - sts:AssumeRole
+      Path: /lambda/
+      Policies:
+        -
+          PolicyName: 
+            !Join
+              - '.'
+              - - !Ref AWS::Region
+                - aws-lambda-top-stories-policy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              -
+                Effect: Allow
+                Action: 
+                  - s3:PutObject
+                  - s3:PutObjectTagging
+                  - s3:GetObjectVersion
+                Resource:
+                  !Join
+                    - ''
+                    - - 'arn:aws:s3:::'
+                      - Fn::ImportValue:
+                          !Join
+                            - ':'
+                            - - !Ref AWS::Region
+                              - aws-lambda-top-stories
+                              - S3-BUCKET
+                      - /*
+              -
+                Effect: Allow
+                Action: 
+                  - sns:Publish
+                Resource:
+                  Fn::ImportValue:
+                    !Join
+                      - ':'
+                      - - !Ref AWS::Region
+                        - aws-lambda-top-stories
+                        - SNS-TOPIC
+Outputs:
+  IAMRole:
+    Description: >
+      Give lambda func limited access to S3 and SNS actions and resources.
+    Value:
+      Ref: LambdaRole
+    Export:
+      Name: 
+        !Join
+          - ':'
+          - - !Ref AWS::Region
+            - aws-lambda-top-stories
+            - ROLE
