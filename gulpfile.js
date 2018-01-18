@@ -18,7 +18,7 @@ gulp.task('deploy', () => {
     // include all files and folders in build
     // include all files that start with a . i.e. .config, .gitignore, etc.
     // exclude existing .zip from this build - it will be overwritten in the pipe
-    const jsFile = 'awsLambdaTopStories-lambdaFunction.js' 
+    const jsFile = 'lambdaFunction.js' 
         , opts = { nodir: true, dot: true }
         , f = filter(['**', '!deploy/*.zip'])
         , publishParmas = { params: { Bucket: process.env.S3_BUCKET } }
@@ -35,3 +35,5 @@ gulp.task('deploy', () => {
   })
   .catch((err) => console.error(err));
 });
+
+gulp.task('cleanup', () => console.log("delete from bucket"));
