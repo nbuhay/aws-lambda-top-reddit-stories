@@ -13,7 +13,7 @@ const aws = require('aws-sdk')
   , TOPIC_ARN = process.env.TOPIC_ARN
   , REFRESH_TOKEN = process.env.REFRESH_TOKEN  // reddit refresh token
   , AWS_REGION = process.env.AWS_REGION  // aws region the function is deployed
-  , NUM_TOP_STORIES = 100  // num stories sent to user
+  , NUM_TOP_STORIES = process.env.NUM_TOP_STORIES  // num stories sent to user
 
 let access_token  // reddit global bearer token
 
@@ -161,11 +161,13 @@ function awsOperations(subredditPosts) {
   // build params for S3 putObject
   let userTopStories =
     JSON.stringify(concatSubredditPosts.reverse().slice(0, NUM_TOP_STORIES), null, '\t')
+    , s3OneWeekAgo = `${oneWeekAgo.getMonth()+1}-${oneWeekAgo.getDay()}-${oneWeekAgo.getFullYear()}`
+    , s3WeekOf = `${weekOf.getMonth()+1}-${weekOf.getDay()}-${weekOf.getFullYear()}`
     , base64data = new Buffer(userTopStories, 'binary')
     , s3Params = {
         Body: base64data,
         Bucket: S3_BUCKET,
-        Key: `${oneWeekAgo.toLocaleDateString()}.${weekOf.toLocaleDateString()}.lambda-top-stories.json`,
+        Key: `${s3OneWeekAgo}.${s3WeekOf}.lambda-top-stories.json`,
         Tagging: 'name=aws-lambda-top-stories'
       }
 

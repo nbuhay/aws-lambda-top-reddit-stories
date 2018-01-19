@@ -1,7 +1,7 @@
 AWSTemplateFormatVersion: 2010-09-09
 Description: >
   Layer 1.
-  IAM role for lambda function.
+  IAM role and policies for lambda function.
   Limited access to S3 and SNS actions and resources.
 Resources:
   LambdaRole:
@@ -63,6 +63,12 @@ Resources:
                       - - !Ref AWS::Region
                         - aws-lambda-top-stories
                         - SNS-TOPIC
+              -
+                Effect: Allow
+                Action:
+                  - autoscaling:Describe*
+                  - cloudwatch:*
+                Resource: '*'
 Outputs:
   IAMRole:
     Description: >

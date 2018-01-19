@@ -1,0 +1,98 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: >
+  Layer 2.
+  Lambda function.
+  Executes weekly Sunday at 8am UTC.
+  Emails a Reddit user their top stories from the week.
+Parameters:
+  UserAgent:
+    Type: String
+  RefreshToken:
+    Type: String
+  ClientId:
+    Type: String
+  ClientSecret:
+    Type: String
+  NumTopStories:
+    Type: Number
+    Default: 100
+Resources:
+  LambdaFunction:
+    Type: AWS::Lambda::Function
+    Properties: 
+      FunctionName: aws-lambda-top-stories
+      Description: >
+        Retrieve a user's top stories form www.reddit.com for the week.
+        Log results to S3 and notify user via SNS email.
+      Runtime: nodejs6.10
+      Role: 
+        !Join
+          - ''
+          - - 'arn:aws:iam::'
+            - !Ref AWS::AccountId
+            - ':role/lambda/'
+            - !Ref AWS::Region
+            - '.aws-lambda-top-stories-role'
+      Handler: lambdaFunction.getTopStories
+      Code:
+        S3Bucket:
+          Fn::ImportValue:
+            !Join
+              - ':'
+              - - !Ref AWS::Region
+                - aws-lambda-top-stories
+                - S3-BUCKET
+        S3Key: aws-lambda-top-stories.deploy.zip
+      Timeout: 10
+      Environment:
+        Variables:
+          USER_AGENT:
+            Ref: UserAgent
+          S3_BUCKET: 
+            Fn::ImportValue:
+              !Join
+                - ':'
+                - - !Ref AWS::Region
+                  - aws-lambda-top-stories
+                  - S3-BUCKET
+          TOPIC_ARN:
+            Fn::ImportValue:
+              !Join
+                - ':'
+                - - !Ref AWS::Region
+                  - aws-lambda-top-stories
+                  - SNS-TOPIC
+          REFRESH_TOKEN:
+            Ref: RefreshToken
+          CLIENT_ID:
+            Ref: ClientId
+          CLIENT_SECRET:
+            Ref: ClientSecret
+          NUM_TOP_STORIES:
+            Ref: NumTopStories
+  EventRule:
+    Type: AWS::Events::Rule
+    Properties:
+      Name: aws-lambda-top-stories-weekly-execution
+      Description: >
+        Execute LambdaFunction every week.
+      # run every Sunday at 8am UTC
+      ScheduleExpression: cron(0 8 ? * SUN *)
+      State: ENABLED
+      Targets:
+        - Arn:
+            Fn::GetAtt:
+              - LambdaFunction
+              - Arn
+          Id: aws-lambda-top-stories-v0.0.1
+  PermissionForEventsToInvokeLambda: 
+    Type: AWS::Lambda::Permission
+    Properties: 
+      FunctionName: 
+        Ref: LambdaFunction
+      Action: lambda:InvokeFunction
+      Principal: events.amazonaws.com
+      SourceArn: 
+        Fn::GetAtt: 
+          - EventRule
+          - Arn
