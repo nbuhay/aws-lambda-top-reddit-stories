@@ -9,6 +9,7 @@
     "gulp": "^3.9.1",
     "gulp-awspublish": "^3.3.0",
     "gulp-filter": "^5.1.0",
-    "gulp-zip": "^4.1.0"
+    "gulp-zip": "^4.1.0",
+    "readline-sync": "^1.4.7"
   }
 }

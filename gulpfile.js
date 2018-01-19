@@ -4,8 +4,33 @@ const gulp = require('gulp')
     , awspublish = require('gulp-awspublish')
     , AWS = require('aws-sdk')
     , S3 = new AWS.S3()
+    , readlineSync = require('readline-sync')
+    , fs = require('fs')
 
 gulp.task('default', () => console.log('Hello from aws-lambda-top-stories gulpfile!'));
+
+// https://www.concurrencylabs.com/blog/configure-your-lambda-function-like-a-champ-sail-smoothly/
+gulp.task('env', () => {
+  const envFile = 'env.json'
+      , s3Parmas = { Bucket: process.env.S3_BUCKET, Key: envFile }
+      , keys = [
+          'UserAgent',
+          'RefreshToken',
+          'ClientId',
+          'ClientSecret',
+          'NumTopStories'
+        ]
+  
+  let env = []
+
+  keys.forEach((key) => {
+     let value = readlineSync.question(`${key}: `);
+     env.push({ ParameterKey: key, ParameterValue: value });
+  });
+
+  fs.writeFile('env.json', JSON.stringify(env),
+    (err) => (err) ? console.error(err) : console.log('Success:  saved to env.json'));
+});
 
 gulp.task('deploy', () => {
   const zipFile = 'aws-lambda-top-stories.deploy.zip'
@@ -35,5 +60,3 @@ gulp.task('deploy', () => {
   })
   .catch((err) => console.error(err));
 });
-
-gulp.task('cleanup', () => console.log("delete from bucket"));
