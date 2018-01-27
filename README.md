@@ -2,7 +2,7 @@
 ![Architecture v01](images/architecture_v01.png?raw=true  "Architecture v01")
 
 ### Sequence Flow
-![Sequence Flow v01](images/sequence_flow_v01.png.png?raw=true  "Sequence Flow v01")
+![Sequence Flow v01](images/sequence_flow_v01.png?raw=true  "Sequence Flow v01")
 
 ### Deploy
 ```bash
