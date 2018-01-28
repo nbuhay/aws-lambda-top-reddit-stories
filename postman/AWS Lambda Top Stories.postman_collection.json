@@ -1,0 +1,508 @@
+{
+	"info": {
+		"name": "AWS Lambda Top Stories",
+		"_postman_id": "77dec1a9-3303-d752-4058-ed124044600f",
+		"description": "",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Reddit Auth",
+			"description": "Allow client app to authenticate and make calls on behalf of the Reddit user owning the client_id app.\n\nRunbook:\n\t1 Authorize User (Choose temporary or permanent access)\n\t2 Retrieve Access Token\n\t\nReference:\nhttps://github.com/reddit/reddit/wiki/OAuth2",
+			"item": [
+				{
+					"name": "1 - User Authorize Temporary",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "87561233-fc83-44a0-87e6-9693a8d6d01c",
+								"type": "text/javascript",
+								"exec": [
+									"// generate random string for state and verify get same back in return",
+									"var state = Math.random().toString(36).substr(2, 10);",
+									"pm.environment.set(\"state\", state);"
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "40ce78f2-c228-43f1-a09d-69a1eb8854a5",
+								"type": "text/javascript",
+								"exec": [
+									"// verify get same back same state string sent to Reddit",
+									"var jsonData = JSON.parse(responseBody);",
+									"if (responseBody.state !== {state}) {",
+									"    console.error(\"returned state does not match sent state\");",
+									"}"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"url": {
+							"raw": "https://www.reddit.com/api/v1/authorize?client_id={{client_id}}&response_type={{response_type}}&state={{state}}&redirect_uri={{redirect_uri}}&duration=temporary&scope=mysubreddits",
+							"protocol": "https",
+							"host": [
+								"www",
+								"reddit",
+								"com"
+							],
+							"path": [
+								"api",
+								"v1",
+								"authorize"
+							],
+							"query": [
+								{
+									"key": "client_id",
+									"value": "{{client_id}}",
+									"equals": true
+								},
+								{
+									"key": "response_type",
+									"value": "{{response_type}}",
+									"equals": true
+								},
+								{
+									"key": "state",
+									"value": "{{state}}",
+									"equals": true
+								},
+								{
+									"key": "redirect_uri",
+									"value": "{{redirect_uri}}",
+									"equals": true
+								},
+								{
+									"key": "duration",
+									"value": "temporary",
+									"equals": true
+								},
+								{
+									"key": "scope",
+									"value": "mysubreddits",
+									"equals": true
+								}
+							]
+						},
+						"description": "First step in authorization process.  User allows/denies registered reddit client_id app from accessing their user data for their subreddit data.  Access is granted for 1 hour.\n\nRequired:  Run in browser as signed in Reddit user who owns the client_id app."
+					},
+					"response": []
+				},
+				{
+					"name": "1 - User Authorize Permanent",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "ddf8ee8e-37e1-487e-a944-363b95330bd5",
+								"type": "text/javascript",
+								"exec": [
+									"// generate random string for state and verify get same back in return",
+									"var state = Math.random().toString(36).substr(2, 10);",
+									"pm.environment.set(\"state\", state);"
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "efa46662-e5ac-463b-afb4-3afd4fd5f06f",
+								"type": "text/javascript",
+								"exec": [
+									"// verify get same back same state string sent to Reddit",
+									"var jsonData = JSON.parse(responseBody);",
+									"if (responseBody.state !== {state}) {",
+									"    console.error(\"returned state does not match sent state\");",
+									"}"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"url": {
+							"raw": "https://www.reddit.com/api/v1/authorize?client_id={{client_id}}&response_type={{response_type}}&state={{state}}&redirect_uri={{redirect_uri}}&duration=permanent&scope=mysubreddits",
+							"protocol": "https",
+							"host": [
+								"www",
+								"reddit",
+								"com"
+							],
+							"path": [
+								"api",
+								"v1",
+								"authorize"
+							],
+							"query": [
+								{
+									"key": "client_id",
+									"value": "{{client_id}}",
+									"equals": true
+								},
+								{
+									"key": "response_type",
+									"value": "{{response_type}}",
+									"equals": true
+								},
+								{
+									"key": "state",
+									"value": "{{state}}",
+									"equals": true
+								},
+								{
+									"key": "redirect_uri",
+									"value": "{{redirect_uri}}",
+									"equals": true
+								},
+								{
+									"key": "duration",
+									"value": "permanent",
+									"equals": true
+								},
+								{
+									"key": "scope",
+									"value": "mysubreddits",
+									"equals": true
+								}
+							]
+						},
+						"description": "First step in authorization process.  User allows/denies registered reddit client_id app from accessing their user data for their subreddit data.  Access is granted until manually revoked.\n\nRequired:  Run in browser as signed in Reddit user who owns the client_id app."
+					},
+					"response": []
+				},
+				{
+					"name": "2 - Retrieve Access Token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "e8a300a6-15ea-46aa-bf61-204e3aaa5a67",
+								"type": "text/javascript",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"postman.setEnvironmentVariable(\"reddit_access_token\", jsonData.access_token);"
+								]
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "{{client_secret_id_never_share}}",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "{{client_id}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/x-www-form-urlencoded"
+							},
+							{
+								"key": "",
+								"value": "",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "grant_type",
+									"value": "{{grant_type}}",
+									"description": "",
+									"type": "text"
+								},
+								{
+									"key": "code",
+									"value": "{{code}}",
+									"description": "",
+									"type": "text"
+								},
+								{
+									"key": "redirect_uri",
+									"value": "{{redirect_uri}}",
+									"description": "",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "https://www.reddit.com/api/v1/access_token",
+							"protocol": "https",
+							"host": [
+								"www",
+								"reddit",
+								"com"
+							],
+							"path": [
+								"api",
+								"v1",
+								"access_token"
+							]
+						},
+						"description": "Second step in getting api access.  Use one-time-token code from first step to retrieve an access token for furhter reddit api calls."
+					},
+					"response": []
+				},
+				{
+					"name": "2 - Refresh Permanent Access Token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "e8a300a6-15ea-46aa-bf61-204e3aaa5a67",
+								"type": "text/javascript",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"postman.setEnvironmentVariable(\"reddit_access_token\", jsonData.access_token);"
+								]
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "{{client_secret_id_never_share}}",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "{{client_id}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/x-www-form-urlencoded"
+							},
+							{
+								"key": "",
+								"value": "",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "grant_type",
+									"value": "refresh_token",
+									"description": "",
+									"type": "text"
+								},
+								{
+									"key": "refresh_token",
+									"value": "{{refresh_token}}",
+									"description": "",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "https://www.reddit.com/api/v1/access_token",
+							"protocol": "https",
+							"host": [
+								"www",
+								"reddit",
+								"com"
+							],
+							"path": [
+								"api",
+								"v1",
+								"access_token"
+							]
+						},
+						"description": "Second step in getting api access.  Use one-time-token code from first step to retrieve an access token for furhter reddit api calls."
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "e5d569fe-5607-41d6-9fcd-2a2999d08cc3",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "0870f905-a689-4b5c-99b4-e9d786533c8d",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Subreddit APIs",
+			"description": "Reddit APIs used in the Lambda Top Stories app.\n\nReference:\nhttps://www.reddit.com/dev/api/oauth#listings",
+			"item": [
+				{
+					"name": "3 User's Subscribed Subreddits",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "87e416ba-8dd5-4d07-9271-e66ada279d4c",
+								"type": "text/javascript",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"jsonData.data.children.forEach((subreddit) => console.log(subreddit.data.url));",
+									"pm.environment.set(\"user_subreddit_title\", jsonData.data.children[0].data.title);"
+								]
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{reddit_access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"url": {
+							"raw": "https://oauth.reddit.com/subreddits/mine/subscriber",
+							"protocol": "https",
+							"host": [
+								"oauth",
+								"reddit",
+								"com"
+							],
+							"path": [
+								"subreddits",
+								"mine",
+								"subscriber"
+							]
+						},
+						"description": "Retrieve authorized user's list of subscribed subreddits.\n\nRequired:  Bearer Token retrieved from Reddit Auth Flow. "
+					},
+					"response": []
+				},
+				{
+					"name": "4 Week's Top Posts for a Subscribed Subreddit",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "ecab41c1-df35-40c4-8aaa-2a41404c6955",
+								"type": "text/javascript",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"jsonData.data.children.forEach((post) => {",
+									"   var data = {",
+									"       \"score\": post.data.score,",
+									"       \"title\": post.data.title,",
+									"       \"url\": post.data.url,",
+									"       \"subreddit_name_prefixed\": post.data.subreddit_name_prefixed,",
+									"       \"comments\": `https://www.reddit.com${post.data.permalink}`",
+									"   };",
+									"   console.log(data);",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{reddit_access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"url": {
+							"raw": "https://oauth.reddit.com/r/{{user_subreddit_title}}/top/?t=week",
+							"protocol": "https",
+							"host": [
+								"oauth",
+								"reddit",
+								"com"
+							],
+							"path": [
+								"r",
+								"{{user_subreddit_title}}",
+								"top",
+								""
+							],
+							"query": [
+								{
+									"key": "t",
+									"value": "week",
+									"equals": true
+								}
+							]
+						},
+						"description": "Get top 25 posts for a user's subscribed subreddit."
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "fe5da93e-7a56-4069-966e-ba2a2c5e3f3f",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "b7e1b188-f747-4424-849c-77f7c44ef5e3",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		}
+	]
+}
